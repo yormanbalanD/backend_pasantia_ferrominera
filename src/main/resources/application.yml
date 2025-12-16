@@ -1,0 +1,13 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api
+spring:
+  application:
+    name: fmowinconf
+  jpa:
+    database-platform: com.fmowinconf.db.dialect.SQLiteDialect
+    show-sql: true
+  datasource:
+    url: jdbc:sqlite:src/main/java/com/fmowinconf/db/test.db
+    driver-class-name: org.sqlite.JDBC

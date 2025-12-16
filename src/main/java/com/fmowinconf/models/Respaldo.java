@@ -49,6 +49,9 @@ public class Respaldo {
     @Column(name = "created_at")
     private String created_at;
 
+    @Column(name = "completado_con_exito")
+    private int completado_con_exito; // 1 = COMPLETADO, 0 = ERROR, 2 = EN PROCESO
+
     @OneToMany(mappedBy = "respaldo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     @JsonManagedReference(value = "archivo-respaldo")

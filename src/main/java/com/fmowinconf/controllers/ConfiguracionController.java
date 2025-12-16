@@ -24,6 +24,5 @@ public class ConfiguracionController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al crear la configuración: " + e.getMessage());
         }
-    }
-    
+    }   
 }

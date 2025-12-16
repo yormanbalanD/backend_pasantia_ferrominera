@@ -15,5 +15,6 @@ public class RespaldoDTO {
     private String fmo_equipo;
     private String sistema_operativo;
     private String created_at;
+    private int completado_con_exito;
     private List<ArchivoDTO> archivos = new ArrayList<>();
 }

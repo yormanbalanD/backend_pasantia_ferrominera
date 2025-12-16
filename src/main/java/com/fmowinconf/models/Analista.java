@@ -60,14 +60,4 @@ public class Analista {
     @ToString.Exclude
     @JsonManagedReference(value = "respaldos-analista")
     private List<Respaldo> respaldos = new ArrayList<>();
-
-    @PrePersist
-    public void prePersist() {
-        // Si la fecha es nula, asignamos la fecha actual antes de guardar
-        if (this.created_at == null) {
-            // SQLite usa formato ISO-8601 por defecto con CURRENT_TIMESTAMP
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            this.created_at = LocalDateTime.now().format(formatter);
-        }
-    }
 }

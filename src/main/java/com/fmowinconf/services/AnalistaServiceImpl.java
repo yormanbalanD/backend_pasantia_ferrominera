@@ -7,6 +7,8 @@ import com.fmowinconf.repository.AnalistaRepository;
 import com.fmowinconf.dto.response.AnalistaDTO;
 import com.fmowinconf.models.Analista;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 @Service
 public class AnalistaServiceImpl implements IAnalistaService {
@@ -24,6 +26,11 @@ public class AnalistaServiceImpl implements IAnalistaService {
         newAnalista.setNombre_completo(analista.getNombre_completo());
         newAnalista.setPassword(analista.getPassword());
         newAnalista.setPermisos(analista.getPermisos());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String created_at = LocalDateTime.now().format(formatter);
+
+        newAnalista.setCreated_at(created_at);
 
         return analistaRepository.save(newAnalista);
     }    

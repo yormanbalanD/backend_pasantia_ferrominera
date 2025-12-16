@@ -8,4 +8,5 @@ public class ConfiguracionIPDTO {
     private String ip_address;
     private String subnet_mask;
     private String default_gateway;
+    private String created_at;
 }

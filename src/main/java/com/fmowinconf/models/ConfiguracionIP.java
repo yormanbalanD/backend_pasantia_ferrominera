@@ -41,4 +41,6 @@ public class ConfiguracionIP {
     private String subnet_mask;
     @Column(name = "default_gateway")
     private String default_gateway;
+    @Column(name = "created_at")
+    private String created_at;
 }

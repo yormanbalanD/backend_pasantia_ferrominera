@@ -1,0 +1,2 @@
+INSERT INTO configuracion(analista_id, fmo_equipo, crear_usuario, mozilla_firefox, mozilla_thunderbird, hostname_dominio, configurar_impresora, configurar_escaner, configurar_ip)
+VALUES(1, "FMO-1197694", 1, 1, 1, 0, 0, 0, 2), (1, "FMO-1193324", 0, 0, 0, 1, 1, 1, 1), (3, "FMO-1194565", 0, 1, 1, 0, 1, 0, 1);

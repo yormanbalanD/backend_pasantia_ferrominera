@@ -11,9 +11,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.util.ArrayList;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
@@ -24,7 +29,7 @@ import jakarta.persistence.FetchType;
 @Data
 @ToString
 
-@Table(name = "configuraciones")
+@Table(name = "configuracion")
 public class Configuracion {
 
     @Id
@@ -34,6 +39,7 @@ public class Configuracion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "analista_id")
     @ToString.Exclude
+    @JsonBackReference(value = "configuraciones-analista")
     private Analista analista;
 
     @Column(name = "fmo_equipo")
@@ -56,11 +62,13 @@ public class Configuracion {
     private String created_at;
 
     // relaciones hacia configuraciones dependientes
-    @OneToMany(mappedBy = "configuracion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "configuracion", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @ToString.Exclude
-    private List<ConfiguracionIP> ipConfigs = new ArrayList<>();
+    @JsonManagedReference(value = "configuracion-ip")
+    private ConfiguracionIP ipConfig;
 
-    @OneToMany(mappedBy = "configuracion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "configuracion", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @ToString.Exclude
-    private List<ConfiguracionImpresora> impresoras = new ArrayList<>();
+    @JsonManagedReference(value = "configuracion-impresora")
+    private ConfiguracionImpresora impresora;
 }

@@ -1,0 +1,2 @@
+INSERT INTO analista(nombre_completo, ficha, password)
+VALUES("Pablo tochon", "2331", "123456"), ("Javier", "3342", "324324"), ("Angel Rondon", "331", "contrasena"), ("Rixon Larez", "32323", "password");

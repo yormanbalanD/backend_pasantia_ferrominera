@@ -11,9 +11,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.val;
+import lombok.Builder.Default;
+
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 
@@ -37,13 +47,27 @@ public class Analista {
     private String password;
     @Column(name = "created_at")
     private String created_at;
+    @Column(name = "permisos")
+    private String permisos;
 
     // nuevas relaciones
     @OneToMany(mappedBy = "analista", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @JsonManagedReference(value = "configuraciones-analista")
     private List<Configuracion> configuraciones = new ArrayList<>();
 
     @OneToMany(mappedBy = "analista", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @JsonManagedReference(value = "respaldos-analista")
     private List<Respaldo> respaldos = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        // Si la fecha es nula, asignamos la fecha actual antes de guardar
+        if (this.created_at == null) {
+            // SQLite usa formato ISO-8601 por defecto con CURRENT_TIMESTAMP
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            this.created_at = LocalDateTime.now().format(formatter);
+        }
+    }
 }

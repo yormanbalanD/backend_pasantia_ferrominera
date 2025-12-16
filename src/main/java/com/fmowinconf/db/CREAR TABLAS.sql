@@ -9,6 +9,7 @@ CREATE TABLE analista (
     nombre_completo TEXT,
     ficha TEXT,
     password TEXT,
+	permisos TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

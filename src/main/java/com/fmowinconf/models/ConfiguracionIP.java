@@ -1,5 +1,7 @@
 package com.fmowinconf.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
@@ -26,9 +29,10 @@ public class ConfiguracionIP {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_configuraciones")
     @ToString.Exclude
+    @JsonManagedReference(value = "configuracion-ip")
     private Configuracion configuracion;
 
     @Column(name = "ip_address")

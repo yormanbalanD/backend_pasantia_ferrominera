@@ -10,7 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.val;
+
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.util.ArrayList;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -33,6 +39,7 @@ public class Respaldo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "analista_id")
     @ToString.Exclude
+    @JsonBackReference(value = "respaldos-analista")
     private Analista analista;
 
     @Column(name = "fmo_equipo")
@@ -44,5 +51,6 @@ public class Respaldo {
 
     @OneToMany(mappedBy = "respaldo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @JsonManagedReference(value = "archivo-respaldo")
     private List<Archivo> archivos = new ArrayList<>();
 }

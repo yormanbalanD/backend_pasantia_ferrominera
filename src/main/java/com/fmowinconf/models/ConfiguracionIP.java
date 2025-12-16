@@ -1,5 +1,6 @@
 package com.fmowinconf.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -32,7 +33,7 @@ public class ConfiguracionIP {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_configuraciones")
     @ToString.Exclude
-    @JsonManagedReference(value = "configuracion-ip")
+    @JsonBackReference(value = "configuracion-ip")
     private Configuracion configuracion;
 
     @Column(name = "ip_address")

@@ -1,0 +1,38 @@
+meta {
+  name: Crear Configuracion
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://127.0.0.1:8082/api/configuraciones/crearConfiguracion
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "fmo_equipo": "FMO-1191321",
+    "configurar_escaner": 1,
+    "configurar_impresora": 1,
+    "configurar_ip": 1,
+    "crear_usuario": 1,
+    "hostname_dominio": 1,
+    "mozilla_firefox": 1,
+    "mozilla_thunderbird": 0,
+    "ipConfig": {
+      "ip_address": "192.168.10.55",
+      "default_gateway": "192.168.10.1",
+      "subnet_mask": "255.255.255.0"
+    },
+    "impresora": {
+      "modelo": "HP LaserJet Pro M404dn",
+      "ip_address": "192.168.10.200"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

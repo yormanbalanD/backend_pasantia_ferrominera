@@ -71,4 +71,19 @@ public class Configuracion {
     @ToString.Exclude
     @JsonManagedReference(value = "configuracion-impresora")
     private ConfiguracionImpresora impresora;
+
+    // IMPORTANTE: Métodos Helper para sincronizar la relación
+    public void setIpConfig(ConfiguracionIP ipConfig) {
+        this.ipConfig = ipConfig;
+        if (ipConfig != null) {
+            ipConfig.setConfiguracion(this); // AQUÍ SE ASIGNA EL ID MÁGICAMENTE
+        }
+    }
+
+    public void setImpresora(ConfiguracionImpresora impresora) {
+        this.impresora = impresora;
+        if (impresora != null) {
+            impresora.setConfiguracion(this); // AQUÍ SE ASIGNA EL ID MÁGICAMENTE
+        }
+    }
 }

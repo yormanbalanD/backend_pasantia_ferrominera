@@ -24,6 +24,7 @@ public class ConfiguracionServiceImpl {
     public Configuracion crearConfiguracion(ConfiguracionDTO configuracionDTO) {
         // Lógica para crear una configuración utilizando los repositorios
         Configuracion configuracion = new Configuracion();
+        configuracion.setAnalista(configuracionDTO.getAnalista());
         configuracion.setFmo_equipo(configuracionDTO.getFmo_equipo());
         configuracion.setConfigurar_escaner(configuracionDTO.getConfigurar_escaner());
         configuracion.setConfigurar_impresora(configuracionDTO.getConfigurar_impresora());

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.ArrayList;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
@@ -57,14 +58,46 @@ public class Archivo {
     private String nombre_archivo;
 
     @Column(name = "es_carpeta")
-    private String es_carpeta;
+    private int es_carpeta;
 
     @Column(name = "ruta")
     private String ruta;
+
+    @Column(name = "ruta_destino")
+    private String ruta_destino;
 
     @Column(name = "extension")
     private String extension;
 
     @Column(name = "tamaño")
     private String tamaño;
+
+    @PrePersist
+    public void prePersist() {
+        // Verificamos que la ruta no sea nula ni vacía
+        if (this.ruta != null && !this.ruta.isEmpty()) {
+            
+            // Si es una carpeta, generalmente no queremos extensión (opcional según tu lógica)
+            // Asumiendo que 'es_carpeta' puede ser "true", "S", "1", etc.
+            // Si no necesitas esta validación, puedes quitar este if.
+            if (this.es_carpeta == 1) {
+                this.extension = "";
+                return;
+            }
+
+            // Buscamos la posición del último punto en la cadena
+            int ultimoPunto = this.ruta.lastIndexOf('.');
+
+            // Validamos:
+            // 1. Que el punto exista (ultimoPunto > -1)
+            // 2. Que el punto no sea el último caracter (para evitar errores de índice)
+            // 3. (Opcional) Que el punto no sea el primer caracter (index > 0) para archivos ocultos de unix como .bashrc
+            if (ultimoPunto > 0 && ultimoPunto < this.ruta.length() - 1) {
+                this.extension = this.ruta.substring(ultimoPunto + 1);
+            } else {
+                // Si no tiene extensión válida
+                this.extension = ""; 
+            }
+        }
+    }
 }

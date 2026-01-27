@@ -1,0 +1,119 @@
+meta {
+  name: Crear respaldo
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://127.0.0.1:8082/api/respaldos/crearRespaldo
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "analista": {
+      "analista_id": 2
+    },
+    "fmo_equipo": "FMO-1190233",
+    "sistema_operativo": "Windows 10 Pro",
+    "created_at": "2023-11-15 08:00:00",
+    "completado_con_exito": 1,
+    "tipo": "CREAR",
+    "tiempo_start": "2023-11-15 08:00:00",
+    "tiempo_end": "2023-11-15 08:45:30",
+    "archivos": [
+      {
+        "nombre_archivo": "Documentos",
+        "es_carpeta": true,
+        "ruta": "C:/Users/Admin/Documentos",
+        "extension": "",
+        "tamaño": "1GB",
+        "created_at": "2023-11-15 08:05:00",
+        "hijos": [
+          {
+            "nombre_archivo": "reporte.pdf",
+            "es_carpeta": false,
+            "ruta": "C:/Users/Admin/Documentos/reporte.pdf",
+            "extension": ".pdf",
+            "tamaño": "2MB",
+            "created_at": "2023-11-15 08:05:10",
+            "hijos": []
+          }
+        ]
+      },
+      {
+        "nombre_archivo": "Imagenes",
+        "es_carpeta": true,
+        "ruta": "C:/Users/Admin/Imagenes",
+        "extension": "",
+        "tamaño": "0",
+        "created_at": "2023-11-15 08:10:00",
+        "hijos": [
+          {
+            "nombre_archivo": "Eventos",
+            "es_carpeta": true,
+            "ruta": "C:/Users/Admin/Imagenes/Eventos",
+            "extension": "",
+            "tamaño": "4MB",
+            "created_at": "2023-11-15 08:11:00",
+            "hijos": [
+              {
+                "nombre_archivo": "2023",
+                "es_carpeta": true,
+                "ruta": "C:/Users/Admin/Imagenes/Eventos/2023",
+                "extension": "",
+                "tamaño": "5MB",
+                "created_at": "2023-11-15 08:11:30",
+                "hijos": [
+                  {
+                    "nombre_archivo": "Navidad",
+                    "es_carpeta": true,
+                    "ruta": "C:/Users/Admin/Imagenes/Eventos/2023/Navidad",
+                    "extension": "",
+                    "tamaño": "3MB",
+                    "created_at": "2023-11-15 08:12:00",
+                    "hijos": [
+                      {
+                        "nombre_archivo": "cena_equipo.jpg",
+                        "es_carpeta": false,
+                        "ruta": "C:/Users/Admin/Imagenes/Eventos/2023/Navidad/cena_equipo.jpg",
+                        "extension": ".jpg",
+                        "tamaño": "45MB",
+                        "created_at": "2023-11-15 08:12:10",
+                        "hijos": []
+                      },
+                      {
+                        "nombre_archivo": "brindis.png",
+                        "es_carpeta": false,
+                        "ruta": "C:/Users/Admin/Imagenes/Eventos/2023/Navidad/brindis.png",
+                        "extension": ".png",
+                        "tamaño": "32GB",
+                        "created_at": "2023-11-15 08:12:15",
+                        "hijos": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "nombre_archivo": "logo.png",
+            "es_carpeta": false,
+            "ruta": "C:/Users/Admin/Imagenes/logo.png",
+            "extension": ".png",
+            "tamaño": "32MB",
+            "created_at": "2023-11-15 08:10:05",
+            "hijos": []
+          }
+        ]
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

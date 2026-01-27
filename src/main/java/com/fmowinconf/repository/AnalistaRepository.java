@@ -8,4 +8,6 @@ import com.fmowinconf.models.Analista;
 
 @Repository
 public interface AnalistaRepository extends JpaRepository <Analista, Long> {
+    // Crea FindByFicha
+    Analista findByFicha(String ficha);
 }

@@ -1,6 +1,8 @@
 package com.fmowinconf.dto.response;
 
 import com.fmowinconf.models.Analista;
+
+import jakarta.persistence.Column;
 import lombok.Data;
 
 @Data
@@ -15,6 +17,10 @@ public class ConfiguracionDTO {
     private int hostname_dominio;
     private int configurar_impresora;
     private int configurar_escaner;
+    private int usuario_administrador;
+    private int desactivar_usuario_actual;
+
+    private String sistema_operativo;
 
     private int configurar_ip;
 

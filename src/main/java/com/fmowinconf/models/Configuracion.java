@@ -10,9 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.Builder.Default;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.ArrayList;
@@ -36,16 +39,16 @@ public class Configuracion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "analista_id")
     @ToString.Exclude
-    @JsonBackReference(value = "configuraciones-analista")
+    // @JsonBackReference(value = "configuraciones-analista")
+    @JsonIgnoreProperties({"respaldos", "configuraciones"})
     private Analista analista;
 
     @Column(name = "fmo_equipo")
     private String fmo_equipo;
-    @Column(name = "crear_usuario")
-    private int crear_usuario;
+
     @Column(name = "mozilla_firefox")
     private int mozilla_firefox;
     @Column(name = "mozilla_thunderbird")
@@ -60,7 +63,14 @@ public class Configuracion {
     private int configurar_ip;
     @Column(name = "created_at")
     private String created_at;
-
+    @Column(name = "sistema_operativo")
+    private String sistema_operativo;
+    @Column(name = "visible")
+    private int visible;
+    @Column(name = "usuario_administrador")
+    private int usuario_administrador;
+    @Column(name = "desactivar_usuario_actual")
+    private int desactivar_usuario_actual;
     // relaciones hacia configuraciones dependientes
     @OneToOne(mappedBy = "configuracion", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @ToString.Exclude

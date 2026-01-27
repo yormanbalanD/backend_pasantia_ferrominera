@@ -25,6 +25,7 @@ CREATE TABLE configuracion (
     configurar_impresora INTEGER,  -- Corregido de BOOLEAN a INTEGER
     configurar_escaner INTEGER,    -- Corregido de BOOLEAN a INTEGER
     configurar_ip INTEGER,         -- Corregido de BOOLEAN a INTEGER
+	sistema_operativo TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (analista_id) REFERENCES analista(id)
 );
@@ -57,6 +58,10 @@ CREATE TABLE respaldo (
     fmo_equipo TEXT,
     sistema_operativo TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+	completado_con_exito INT,
+	tipo TEXT, -- CARGAR, CREAR
+	tiempo_start TEXT,
+	tiempo_end TEXT,
     FOREIGN KEY (analista_id) REFERENCES analista(id)
 );
 

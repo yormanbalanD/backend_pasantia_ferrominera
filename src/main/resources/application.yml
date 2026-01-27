@@ -7,7 +7,11 @@ spring:
     name: fmowinconf
   jpa:
     database-platform: com.fmowinconf.db.dialect.SQLiteDialect
-    show-sql: true
+    show-sql: false
   datasource:
-    url: jdbc:sqlite:src/main/java/com/fmowinconf/db/test.db
+    # Cambiamos la ruta a la raíz del proyecto (fuera de src)
+    url: jdbc:sqlite:./test.db
     driver-class-name: org.sqlite.JDBC
+  devtools:
+    restart:
+      exclude: "**/*.db,**/test.db"

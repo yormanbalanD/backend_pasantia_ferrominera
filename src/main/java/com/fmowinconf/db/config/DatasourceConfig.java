@@ -13,7 +13,7 @@ public class DatasourceConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
-        dataSource.setUrl("jdbc:sqlite:src/main/java/com/fmowinconf/db/test.db");
+        dataSource.setUrl("jdbc:sqlite:./test.db");
         return dataSource;
     }
 }

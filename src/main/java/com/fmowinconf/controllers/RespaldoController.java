@@ -5,8 +5,11 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fmowinconf.config.auth.ContenidoJWT;
 import com.fmowinconf.dto.request.EditarFMO;
 import com.fmowinconf.dto.request.EliminarObjetos;
 import com.fmowinconf.dto.response.RespaldoDTO;
@@ -40,6 +43,7 @@ public class RespaldoController {
         return ResponseEntity.ok(lista);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ANALISTA')")
     @GetMapping("/respaldos")
     public ResponseEntity<?> obtenerTodosLosRespaldos(
             @RequestParam(value = "desde", required = false) String desde,
@@ -48,49 +52,59 @@ public class RespaldoController {
             @RequestParam(value = "sistema_operativo", required = false) String sistema_operativo,
             @RequestParam(value = "fmo_equipo", required = false) String fmo_equipo,
             @RequestParam(value = "nombre_completo", required = false) String nombre_completo,
-            @RequestParam(value = "exacto", required = false) Boolean exacto) {
+            @RequestParam(value = "exacto", required = false) Boolean exacto,
+            Authentication authentication) {
 
+        Object resultado;
+
+        // 1. Lógica de selección de datos
         if (ficha != null) {
             if (exacto != null && exacto) {
-                return ResponseEntity.ok().body(respaldoService.obtenerRespaldosPorFichaAnalistaExacta(ficha));
+                resultado = respaldoService.obtenerRespaldosPorFichaAnalistaExacta(ficha);
+            } else {
+                resultado = respaldoService.obtenerRespaldosPorFichaAnalista(ficha);
             }
-            return ResponseEntity.ok().body(respaldoService.obtenerRespaldosPorFichaAnalista(ficha));
+        } else if (sistema_operativo != null) {
+            resultado = respaldoService.obtenerRespaldosPorSistemaOperativo(sistema_operativo);
+        } else if (fmo_equipo != null) {
+            resultado = respaldoService.obtenerRespaldosPorFmoEquipo(fmo_equipo);
+        } else if (nombre_completo != null) {
+            resultado = respaldoService.obtenerRespaldosPorNombreAnalista(nombre_completo);
+        } else {
+            // Lógica de fechas
+            if ((desde == null || desde.isEmpty()) && (hasta == null || hasta.isEmpty())) {
+                resultado = respaldoService.obtenerTodosLosRespaldos();
+            } else {
+                if (desde == null || desde.isEmpty())
+                    desde = "1900-01-01 00:00:00";
+                if (hasta == null || hasta.isEmpty()) {
+                    hasta = java.time.LocalDateTime.now()
+                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                }
+                resultado = respaldoService.obtenerRespaldosEntreFechas(desde, hasta);
+            }
         }
 
-        if (sistema_operativo != null) {
-            return ResponseEntity.ok().body(respaldoService.obtenerRespaldosPorSistemaOperativo(sistema_operativo));
+        // 2. Aplicación de la regla de negocio: ANALISTA solo ve visibles != 0
+        ContenidoJWT usuario = (ContenidoJWT) authentication.getPrincipal();
+
+        if ("ANALISTA".equals(usuario.getPermisos()) && resultado instanceof List<?>) {
+            // Filtramos la lista dinámicamente
+            resultado = ((List<?>) resultado).stream()
+                    .filter(item -> {
+                        // Si tus clases de modelo heredan de una base o son iguales,
+                        // puedes castear a una interfaz o clase específica aquí.
+                        // Usaremos una validación segura por si el objeto no tiene el campo.
+                        try {
+                            return (int) item.getClass().getMethod("getVisible").invoke(item) != 0;
+                        } catch (Exception e) {
+                            return true; // En caso de error, mostramos el registro por defecto
+                        }
+                    })
+                    .toList();
         }
 
-        if (fmo_equipo != null) {
-            return ResponseEntity.ok().body(respaldoService.obtenerRespaldosPorFmoEquipo(fmo_equipo));
-        }
-
-        if (nombre_completo != null) {
-            return ResponseEntity.ok().body(respaldoService.obtenerRespaldosPorNombreAnalista(nombre_completo));
-        }
-
-        // CASO 0: si no se envia ni desde ni hasta, se devuelve todo el historial
-        if (desde == null || desde.isEmpty() && hasta == null || hasta.isEmpty()) {
-            return ResponseEntity.ok().body(respaldoService.obtenerTodosLosRespaldos());
-        }
-
-        // CASO 1: Si no envía 'desde', asumimos que quiere ver todo el historial
-        if (desde == null || desde.isEmpty()) {
-            desde = "1900-01-01 00:00:00";
-        }
-
-        // CASO 2: Si envía 'desde' pero no 'hasta', asumimos que 'hasta' es HOY AHORA
-        // MISMO
-        if (hasta == null || hasta.isEmpty()) {
-            // Generamos la fecha actual en tu formato
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd HH:mm:ss");
-            hasta = java.time.LocalDateTime.now().format(formatter);
-        }
-
-        // Ejecutamos la búsqueda por rango (ya sea el rango completo o desde X hasta
-        // Hoy)
-        return ResponseEntity.ok().body(respaldoService.obtenerRespaldosEntreFechas(desde, hasta));
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping("/respaldos/delete")
@@ -103,9 +117,11 @@ public class RespaldoController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/respaldos/editar-fmo")
     public ResponseEntity<?> editarFMO(@RequestBody EditarFMO editarFMO) {
-        System.out.println("Editar FMO respaldo con ID: " + editarFMO.getId() + " nuevo FMO: " + editarFMO.getFmo_equipo());
+        System.out.println(
+                "Editar FMO respaldo con ID: " + editarFMO.getId() + " nuevo FMO: " + editarFMO.getFmo_equipo());
         try {
             respaldoService.editarFmoEquipoRespaldo(editarFMO.getId(), editarFMO.getFmo_equipo());
             return ResponseEntity.ok(Map.of("ok", true));

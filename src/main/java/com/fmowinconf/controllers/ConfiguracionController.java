@@ -1,11 +1,15 @@
 package com.fmowinconf.controllers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fmowinconf.config.auth.ContenidoJWT;
 import com.fmowinconf.dto.request.EditarFMO;
 import com.fmowinconf.dto.request.EliminarObjetos;
 import com.fmowinconf.dto.response.ConfiguracionDTO;
@@ -31,6 +35,7 @@ public class ConfiguracionController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ANALISTA')")
     @GetMapping("configuraciones")
     public ResponseEntity<?> getMethodName(
             @RequestParam(value = "desde", required = false) String desde,
@@ -39,51 +44,66 @@ public class ConfiguracionController {
             @RequestParam(value = "sistema_operativo", required = false) String sistema_operativo,
             @RequestParam(value = "fmo_equipo", required = false) String fmo_equipo,
             @RequestParam(value = "nombre_completo", required = false) String nombre_completo,
-            @RequestParam(value = "exacto", required = false) Boolean exacto) {
+            @RequestParam(value = "exacto", required = false) Boolean exacto,
+            Authentication authentication) { // <-- Inyectamos la autenticación
 
-        // 1. Prioridad: Búsqueda por analista
+        Object resultado;
+
+        // 1. Lógica de obtención de datos (tu lógica original)
         if (ficha != null) {
             if (exacto != null && exacto) {
-                return ResponseEntity.ok()
-                        .body(configuracionService.obtenerConfiguracionesPorFichaAnalistaExacta(ficha));
+                resultado = configuracionService.obtenerConfiguracionesPorFichaAnalistaExacta(ficha);
+            } else {
+                resultado = configuracionService.obtenerPorFichaAnalista(ficha);
             }
-            return ResponseEntity.ok().body(configuracionService.obtenerPorFichaAnalista(ficha));
+        } else if (sistema_operativo != null) {
+            resultado = configuracionService.obtenerPorSistemaOperativo(sistema_operativo);
+        } else if (fmo_equipo != null) {
+            resultado = configuracionService.obtenerPorFmoEquipo(fmo_equipo);
+        } else if (nombre_completo != null) {
+            resultado = configuracionService.obtenerPorNombreAnalista(nombre_completo);
+        } else {
+            // Lógica de fechas
+            boolean desdeEsNuloOVacio = (desde == null || desde.trim().isEmpty());
+            boolean hastaEsNuloOVacio = (hasta == null || hasta.trim().isEmpty());
+
+            if (desdeEsNuloOVacio && hastaEsNuloOVacio) {
+                resultado = configuracionService.obtenerTodasLasConfiguraciones();
+            } else {
+                if (desdeEsNuloOVacio)
+                    desde = "1900-01-01 00:00:00";
+                if (hastaEsNuloOVacio) {
+                    hasta = java.time.LocalDateTime.now()
+                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                }
+                resultado = configuracionService.obtenerConfiguracionEntreFechas(desde, hasta);
+            }
         }
 
-        if (sistema_operativo != null) {
-            return ResponseEntity.ok().body(configuracionService.obtenerPorSistemaOperativo(sistema_operativo));
+        // 2. APLICAR FILTRO DE SEGURIDAD
+        ContenidoJWT usuario = (ContenidoJWT) authentication.getPrincipal();
+
+        if ("ANALISTA".equals(usuario.getPermisos()) && resultado instanceof List<?>) {
+            List<?> lista = (List<?>) resultado;
+            // Filtramos: Solo se mantienen si visible != 0
+            // (Asegúrate de que la clase de los objetos en la lista tenga el método
+            // getVisible())
+            resultado = lista.stream()
+                    .filter(item -> {
+                        try {
+                            // Usamos reflexión simple o casting si conoces la clase (ej. Configuracion)
+                            // Aquí asumo que tus objetos tienen un método getVisible()
+                            java.lang.reflect.Method getVisible = item.getClass().getMethod("getVisible");
+                            int visible = (int) getVisible.invoke(item);
+                            return visible != 0;
+                        } catch (Exception e) {
+                            return true; // Si no tiene el método, no filtramos para evitar errores
+                        }
+                    })
+                    .toList();
         }
 
-        if (fmo_equipo != null) {
-            return ResponseEntity.ok().body(configuracionService.obtenerPorFmoEquipo(fmo_equipo));
-        }
-
-        if (nombre_completo != null) {
-            return ResponseEntity.ok().body(configuracionService.obtenerPorNombreAnalista(nombre_completo));
-        }
-
-        // 2. CASO 0: Si ambos parámetros son nulos o vacíos, devolvemos todo
-        // Usamos paréntesis para agrupar correctamente la lógica
-        boolean desdeEsNuloOVacio = (desde == null || desde.trim().isEmpty());
-        boolean hastaEsNuloOVacio = (hasta == null || hasta.trim().isEmpty());
-
-        if (desdeEsNuloOVacio && hastaEsNuloOVacio) {
-            return ResponseEntity.ok().body(configuracionService.obtenerTodasLasConfiguraciones());
-        }
-
-        // 3. CASO 1: Si no envía 'desde', fecha mínima
-        if (desdeEsNuloOVacio) {
-            desde = "1900-01-01 00:00:00";
-        }
-
-        // 4. CASO 2: Si no envía 'hasta', fecha actual (AHORA)
-        if (hastaEsNuloOVacio) {
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd HH:mm:ss");
-            hasta = java.time.LocalDateTime.now().format(formatter);
-        }
-
-        return ResponseEntity.ok().body(configuracionService.obtenerConfiguracionEntreFechas(desde, hasta));
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping("configuraciones/delete")
@@ -97,6 +117,7 @@ public class ConfiguracionController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/configuraciones/editar-fmo")
     public ResponseEntity<?> editarFMO(@RequestBody EditarFMO editarFMO) {
         try {

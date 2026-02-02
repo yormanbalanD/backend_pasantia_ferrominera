@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fmowinconf.dto.response.ConfiguracionDTO;
+import com.fmowinconf.models.Analista;
 import com.fmowinconf.models.Configuracion;
 import com.fmowinconf.models.ConfiguracionIP;
 import com.fmowinconf.models.ConfiguracionImpresora;
@@ -30,7 +31,9 @@ public class ConfiguracionServiceImpl {
     public Configuracion crearConfiguracion(ConfiguracionDTO configuracionDTO) {
         // Lógica para crear una configuración utilizando los repositorios
         Configuracion configuracion = new Configuracion();
-        configuracion.setAnalista(configuracionDTO.getAnalista());
+        Analista analista = new Analista();
+        analista.setId(configuracionDTO.getAnalista().getId());
+        configuracion.setAnalista(analista);
         configuracion.setFmo_equipo(configuracionDTO.getFmo_equipo());
         configuracion.setConfigurar_escaner(configuracionDTO.getConfigurar_escaner());
         configuracion.setConfigurar_impresora(configuracionDTO.getConfigurar_impresora());
@@ -39,6 +42,7 @@ public class ConfiguracionServiceImpl {
         configuracion.setMozilla_firefox(configuracionDTO.getMozilla_firefox());
         configuracion.setMozilla_thunderbird(configuracionDTO.getMozilla_thunderbird());
         configuracion.setSistema_operativo(configuracionDTO.getSistema_operativo());
+        configuracion.setVisible(1);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String created_at = LocalDateTime.now().format(formatter);
@@ -106,16 +110,27 @@ public class ConfiguracionServiceImpl {
         return configuracionRepository.findByAnalistaId(id_analista);
     }
 
-    public Configuracion ocultarConfiguracion(Long id) {
+    public Configuracion cambiarVisibleConfiguracion(Long id, int visible) {
         try {
             Configuracion existingConfiguracion = configuracionRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Configuración no encontrada con id: " + id));
 
-            existingConfiguracion.setVisible(0);
+            existingConfiguracion.setVisible(visible);
 
             return configuracionRepository.save(existingConfiguracion);
         } catch (Exception e) {
-            throw new RuntimeException("Error al ocultar la configuración: " + e.getMessage());
+            throw new RuntimeException("Error al cambiar el visible la configuración: " + e.getMessage());
+        }
+    }
+
+    public void eliminarConfiguracion(long id) {
+        try {
+            Configuracion existingConfiguracion = configuracionRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Configuración no encontrada con id: " + id));
+
+            configuracionRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar la configuración: " + e.getMessage());
         }
     }
 

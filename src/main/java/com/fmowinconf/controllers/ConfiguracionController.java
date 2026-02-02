@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fmowinconf.config.auth.ContenidoJWT;
+import com.fmowinconf.dto.request.CambiarVisible;
 import com.fmowinconf.dto.request.EditarFMO;
 import com.fmowinconf.dto.request.EliminarObjetos;
 import com.fmowinconf.dto.response.ConfiguracionDTO;
@@ -51,6 +52,8 @@ public class ConfiguracionController {
 
         // 1. Lógica de obtención de datos (tu lógica original)
         if (ficha != null) {
+            System.out.println(exacto);
+
             if (exacto != null && exacto) {
                 resultado = configuracionService.obtenerConfiguracionesPorFichaAnalistaExacta(ficha);
             } else {
@@ -106,11 +109,23 @@ public class ConfiguracionController {
         return ResponseEntity.ok(resultado);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("configuraciones/delete")
-    public ResponseEntity<?> postMethodName(@RequestBody EliminarObjetos objetoAEliminar) {
+    public ResponseEntity<?> eliminarConfiguracion(@RequestBody EliminarObjetos objetoAEliminar) {
         try {
-            configuracionService.ocultarConfiguracion(objetoAEliminar.getId());
-            System.out.println("Eliminar configuración con ID: " + objetoAEliminar.getId());
+            configuracionService.eliminarConfiguracion(objetoAEliminar.getId());
+
+            return ResponseEntity.ok("Configuración eliminada correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al eliminar la configuración: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("configuraciones/visible")
+    public ResponseEntity<?> cambiarVisibleConfiguracion(@RequestBody CambiarVisible objeto) {
+        try {
+            configuracionService.cambiarVisibleConfiguracion(objeto.getId(), objeto.getVisible());
+            System.out.println("Eliminar configuración con ID: " + objeto.getId());
             return ResponseEntity.ok(Map.of("message", "Configuración eliminada correctamente"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error al eliminar la configuración: " + e.getMessage());

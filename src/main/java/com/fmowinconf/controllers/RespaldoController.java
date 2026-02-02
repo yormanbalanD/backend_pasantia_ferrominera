@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fmowinconf.config.auth.ContenidoJWT;
+import com.fmowinconf.dto.request.CambiarVisible;
 import com.fmowinconf.dto.request.EditarFMO;
 import com.fmowinconf.dto.request.EliminarObjetos;
 import com.fmowinconf.dto.response.RespaldoDTO;
@@ -28,6 +29,7 @@ public class RespaldoController {
     @Autowired
     private RespaldoServiceImpl respaldoService;
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ANALISTA')")
     @PostMapping("/respaldos/crearRespaldo")
     public ResponseEntity<?> crearRespaldo(@RequestBody RespaldoDTO respaldoDTO) {
         try {
@@ -107,13 +109,25 @@ public class RespaldoController {
         return ResponseEntity.ok(resultado);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/respaldos/delete")
-    public ResponseEntity<?> postMethodName(@RequestBody EliminarObjetos objetoAEliminar) {
-        System.out.println("Eliminar respaldo con ID: " + objetoAEliminar.getId());
+    public ResponseEntity<?> eliminarRespaldo(@RequestBody EliminarObjetos objetoAEliminar) {
         try {
-            return ResponseEntity.ok(respaldoService.ocultarRespaldo(objetoAEliminar.getId()));
+            respaldoService.eliminarRespaldo(objetoAEliminar.getId());
+            return ResponseEntity.ok("Respaldo eliminado exitosamente");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al eliminar el respaldo: " + e.getMessage());
+            System.out.println("Error al eliminar el respaldo: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("respaldos/visible")
+    public ResponseEntity<?> cambiarVisibleRespaldo(@RequestBody CambiarVisible objeto) {
+        try {
+            respaldoService.cambiarVisibleRespaldo(objeto.getId(), objeto.getVisible());
+            return ResponseEntity.ok(Map.of("message", "Visible modificado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al cambiar el visible la configuración: " + e.getMessage());
         }
     }
 

@@ -76,4 +76,15 @@ public class AnalistaServiceImpl implements IAnalistaService {
             throw new RuntimeException("Error al ocultar el analista: " + e.getMessage());
         }
     }
+
+    public void eliminarAnalista(Long id) {
+        try {
+            Analista existingAnalista = analistaRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Analista no encontrado con id: " + id));
+
+            analistaRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar el analista: " + e.getMessage());
+        }
+    }
 }

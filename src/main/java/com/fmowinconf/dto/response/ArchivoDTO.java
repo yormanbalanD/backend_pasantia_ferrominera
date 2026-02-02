@@ -14,7 +14,7 @@ public class ArchivoDTO {
 
     private List<ArchivoDTO> hijos = new ArrayList<>();
     private String nombre_archivo;
-    private boolean es_carpeta;
+    private int es_carpeta;
     private String ruta;
     private String extension;
     private String tamaño;

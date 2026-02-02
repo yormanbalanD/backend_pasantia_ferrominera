@@ -14,4 +14,5 @@ public interface IAnalistaService {
     public Analista editarAnalista(Long id, EditarAnalistaDTO analistaDTO);
 
     public Analista ocultarAnalista(Long id);
+     public void eliminarAnalista(Long id);
 }

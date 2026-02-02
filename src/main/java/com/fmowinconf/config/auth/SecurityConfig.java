@@ -33,10 +33,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests(auth -> auth
-                        // 3. Asegúrate de que la ruta de check-auth sea pública
-                        .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/auth/check-auth").authenticated()
-                        .anyRequest().authenticated())
+                // 3. Asegúrate de que la ruta de check-auth sea pública
+                .requestMatchers("/v1/auth/**").permitAll()
+               .requestMatchers("/api/v1/auth/check-auth").authenticated()
+                .anyRequest().authenticated())
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

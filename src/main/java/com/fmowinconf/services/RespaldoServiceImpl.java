@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fmowinconf.dto.response.ArchivoDTO;
 import com.fmowinconf.dto.response.RespaldoDTO;
+import com.fmowinconf.models.Analista;
 import com.fmowinconf.models.Archivo;
 import com.fmowinconf.models.Respaldo;
 import com.fmowinconf.repository.RespaldoRepository;
@@ -23,14 +24,18 @@ public class RespaldoServiceImpl {
     public Respaldo crearRespaldo(RespaldoDTO respaldoDTO) {
         System.out.println(respaldoDTO.toString());
         Respaldo respaldo = new Respaldo();
-        respaldo.setAnalista(respaldoDTO.getAnalista());
+        Analista analista = new Analista();
+        analista.setId(respaldoDTO.getAnalista().getId());
+        
+        respaldo.setAnalista(analista);
         respaldo.setFmo_equipo(respaldoDTO.getFmo_equipo());
         respaldo.setSistema_operativo(respaldoDTO.getSistema_operativo());
         respaldo.setTipo(respaldoDTO.getTipo());
-        respaldo.setCompletado_con_exito(2);
+        respaldo.setCompletado_con_exito(respaldoDTO.getCompletado_con_exito());
 
         respaldo.setTiempo_end(respaldoDTO.getTiempo_end());
         respaldo.setTiempo_start(respaldoDTO.getTiempo_start());
+        respaldo.setVisible(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String created_at = LocalDateTime.now().format(formatter);
         respaldo.setCreated_at(created_at);
@@ -67,7 +72,7 @@ public class RespaldoServiceImpl {
 
         // 1. Mapeo de campos simples
         archivo.setNombre_archivo(dto.getNombre_archivo());
-        archivo.setEs_carpeta(dto.isEs_carpeta() ? 1 : 0);
+        archivo.setEs_carpeta(dto.getEs_carpeta());
         archivo.setRuta(dto.getRuta());
         archivo.setExtension(dto.getExtension());
         archivo.setTamaño(dto.getTamaño());
@@ -136,23 +141,34 @@ public class RespaldoServiceImpl {
         return respaldoRepository.findByAnalistaId(id_analista);
     }
 
-    public Respaldo ocultarRespaldo(Long id) {
+    public Respaldo cambiarVisibleRespaldo(Long id, int visible) {
         try {
             Respaldo existingRespaldo = respaldoRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Respaldo no encontrado con id: " + id));
 
-            existingRespaldo.setVisible(0);
+            existingRespaldo.setVisible(visible);
 
             return respaldoRepository.save(existingRespaldo);
         } catch (Exception e) {
-            throw new RuntimeException("Error al ocultar el respaldo: " + e.getMessage());
+            throw new RuntimeException("Error al cambiar el visible del respaldo: " + e.getMessage());
+        }
+    }
+
+    public void eliminarRespaldo(long id) {
+        try {
+            Respaldo existingRespaldo = respaldoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Respaldo no encontrado con id: " + id));
+
+            respaldoRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar respaldo: " + e.getMessage());
         }
     }
 
     public Respaldo editarFmoEquipoRespaldo(Long id, String fmo_equipo) {
         Optional<Respaldo> data = respaldoRepository.findById(id);
 
-        if(data.isEmpty()){
+        if (data.isEmpty()) {
             throw new RuntimeException("Respaldo no encontrado con id: " + id);
         } else {
             Respaldo existingRespaldo = data.get();

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class RespaldoDTO {
     private long id;
-    private Analista analista;
+    private AnalistaSoloIdDTO analista;
     private String fmo_equipo;
     private String sistema_operativo;
     private String created_at;

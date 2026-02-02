@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class ConfiguracionDTO {
     private long id;
-    private Analista analista;
+    private AnalistaSoloIdDTO analista;
 
     private String fmo_equipo;
     private int crear_usuario;

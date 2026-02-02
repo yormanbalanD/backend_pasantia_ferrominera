@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fmowinconf.config.auth.ContenidoJWT;
 import com.fmowinconf.dto.request.EditarAnalistaDTO;
+import com.fmowinconf.dto.request.EliminarObjetos;
 import com.fmowinconf.dto.response.CrearAnalistaDTO;
 import com.fmowinconf.models.Analista;
 import com.fmowinconf.services.IAnalistaService;
@@ -35,6 +36,7 @@ public class AnalistaController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/analistas")
     public ResponseEntity<?> getAllAnalistas(Authentication authentication) {
         // Obtenemos el principal que seteamos en el filtro
@@ -73,7 +75,18 @@ public class AnalistaController {
             Analista analistaEditado = analistaService.editarAnalista(id, analistaDTO);
             return ResponseEntity.ok().body(analistaEditado);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al editar el analista: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/analistas/delete")
+    public ResponseEntity<?> postMethodName(@RequestBody EliminarObjetos objeto) {
+        try {
+            analistaService.eliminarAnalista(objeto.getId());
+            return ResponseEntity.ok().body("Analista eliminado con exito");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
